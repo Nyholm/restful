@@ -21,6 +21,8 @@ class Settings
     public static $version = '0.1.0';
 
     public static $api_key = null;
+
+    public static $accept = '*/*';
 }
 
 class Resource extends \RESTful\Resource

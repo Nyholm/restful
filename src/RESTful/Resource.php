@@ -73,13 +73,94 @@ abstract class Resource
         return false;
     }
 
-    protected function _objectify($fields)
+    protected function _objectify($request, $links = null)
     {
         // initialize uris
         $this->_collection_uris = array();
         $this->_member_uris = array();
 
+        $resource_name = $this->getURISpec()->name;
+
+        print_r($request);
+        print_r($resource_name);
+        print_r($request->$resource_name);
+
+        if(isset($resquest->$resource_name) || true) {
+            $fields = $request->$resource_name;
+            $fields = $fields[0];
+            $links = $request->links;
+        } else {
+            $fields = $request;
+        }
+
+        /* print_r($fields); */
+        /* $a = 'api_keys'; */
+        /* print_r($fields->$a); */
+        /* var_dump($this->getURISpec()); */
+
+        //$obj = $fields[self::$_uri_spec->name];
+        //print_r($obj);
+
+        print_r('printing fields\n');
+
+        print_r($fields);
+        var_dump($fields);
+
+
+
         foreach ($fields as $key => $val) {
+            if($key == 'links') continue;
+            $this->$key = $val;
+        }
+        foreach($links as $key => $val) {
+            // the links might include links for other resources as well
+            $parts = explode('.', $key);
+            if($parts[0] != $resource_name) continue;
+            //if(strpos($key, $resource_name) !== 0) continue;
+            $name = $parts[1];
+
+            print_r("Working on link $parts[1]");
+            $url = preg_replace_callback(
+                '/\{(\w+)\.(\w+)\}/',
+                function($match) use ($fields) {
+                    $name = $match[2];
+                    if(isset($fields->$name))
+                        return $fields->$name;
+                    elseif(isset($fields->links->$name))
+                        return $fields->links->$name;
+                },
+                $val);
+            print_r("Made url: $url\n");
+            if(isset($fields->links->$key)) {
+                // we have a url for a specific item, so check if it was side loaded
+                // otherwise stub it out
+                $result = self::getRegistry()->match($url);
+                if($result != null) {
+                    if($result['collection']) {
+                        $this->_collection_uris[$name] = array(
+                            'class' => $class,
+                            'uri'   => $val,
+                        );
+                    } else {
+                        $this->_member_uris[$name] = array(
+                            'class' => $class,
+                            'uri'   => $val,
+                        );
+                    }
+                }
+            } else {
+                // this item is paged
+
+            }
+        }
+
+        print_r('printing self\n');
+        print_r($this);
+
+        //if($request->api_keys)
+        //    die(0);
+
+        /*foreach ($fields as $key => $val) {
             // nested uri
             if ((strlen($key) - 3) == strrpos($key, 'uri', 0) && $key != 'uri') {
                 $result = self::getRegistry()->match($val);
@@ -129,7 +210,8 @@ abstract class Resource
 
             // default
             $this->$key = $val;
-        }
+            }*/
+
     }
 
     public static function query()

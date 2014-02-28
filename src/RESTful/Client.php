@@ -59,6 +59,7 @@ class Client
         $settings_class = $this->settings_class;
         $user_agent = $settings_class::$agent . '/' . $settings_class::$version;
         $request->headers['User-Agent'] = $user_agent;
+        $request->headers['Accept'] = $settings_class::$accept;
         if ($settings_class::$api_key != null) {
             $request = $request->authenticateWith($settings_class::$api_key, '');
         }
