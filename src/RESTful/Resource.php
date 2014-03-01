@@ -109,7 +109,7 @@ abstract class Resource
 
 
         foreach ($fields as $key => $val) {
-            if($key == 'links') continue;
+            //if($key == 'links') continue;
             $this->$key = $val;
         }
         foreach($links as $key => $val) {
@@ -131,27 +131,35 @@ abstract class Resource
                 },
                 $val);
             print_r("Made url: $url\n");
-            if(isset($fields->links->$key)) {
+            //if(isset($fields->links->$key)) {
                 // we have a url for a specific item, so check if it was side loaded
                 // otherwise stub it out
                 $result = self::getRegistry()->match($url);
                 if($result != null) {
+                    $class = $result['class'];
                     if($result['collection']) {
                         $this->_collection_uris[$name] = array(
                             'class' => $class,
-                            'uri'   => $val,
+                            'uri'   => $url,
                         );
                     } else {
                         $this->_member_uris[$name] = array(
                             'class' => $class,
-                            'uri'   => $val,
+                            'uri'   => $url,
                         );
                     }
+                } else {
+                    print_r("FAILED TO FIND RESOURCE FOR $url");
+                    //die(1);
                 }
-            } else {
+                /*} else {
                 // this item is paged
-
-            }
+                $result = self::getRegistry()->match($url);
+                if($result != null) {
+                    $class = $result['class'];
+                    if(
+                }
+                }*/
         }
 
         print_r('printing self\n');
@@ -249,17 +257,19 @@ abstract class Resource
         // payload
         $payload = array();
         foreach ($this as $key => $val) {
-            if ($key[0] == '_' || is_object($val)) {
-                continue;
-            }
+            if($key[0] == '_') continue;
+            /* if ($key[0] == '_' || is_object($val)) { */
+            /*     continue; */
+            /* } */
             $payload[$key] = $val;
         }
 
+        print_r($payload);
+        //if($payload) die(10);
+
         // update
-        if (array_key_exists('uri', $payload)) {
-            $uri = $payload['uri'];
-            unset($payload['uri']);
-            $response = self::getClient()->put($uri, $payload);
+        if (array_key_exists('href', $payload)) {
+            $response = self::getClient()->put($payload['href'], $payload);
         } else {
             // create
             $class = get_class($this);
@@ -271,9 +281,9 @@ abstract class Resource
         }
 
         // re-objectify
-        foreach ($this as $key => $val) {
-            unset($this->$key);
-        }
+        /* foreach ($this as $key => $val) { */
+        /*     unset($this->$key); */
+        /* } */
         $this->_objectify($response->body);
 
         return $this;
@@ -284,5 +294,9 @@ abstract class Resource
         self::getClient()->delete($this->uri);
 
         return $this;
+    }
+
+    public function unstore() {
+        return $this->delete();
     }
 }
