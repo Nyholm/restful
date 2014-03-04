@@ -81,11 +81,14 @@ abstract class Resource
 
         $resource_name = $this->getURISpec()->name;
 
-        print_r($request);
-        print_r($resource_name);
-        print_r($request->$resource_name);
+        /* print_r($request); */
+        /* print_r($resource_name); */
+        /* print_r($request->$resource_name); */
+        /* print_r(isset($resquest->$resource_name)); */
 
-        if(isset($resquest->$resource_name) || true) {
+        if($links == null) {
+            var_dump($request);
+            print_r($resource_name);
             $fields = $request->$resource_name;
             $fields = $fields[0];
             $links = $request->links;
@@ -101,12 +104,15 @@ abstract class Resource
         //$obj = $fields[self::$_uri_spec->name];
         //print_r($obj);
 
-        print_r('printing fields\n');
+        //print_r('printing fields\n');
 
-        print_r($fields);
-        var_dump($fields);
+        //print_r($fields);
+        //var_dump($fields);
 
 
+
+        /* print_r("FIELDS\n"); */
+        /* print_r($fields); */
 
         foreach ($fields as $key => $val) {
             //if($key == 'links') continue;
@@ -119,7 +125,7 @@ abstract class Resource
             //if(strpos($key, $resource_name) !== 0) continue;
             $name = $parts[1];
 
-            print_r("Working on link $parts[1]");
+            //print_r("Working on link $parts[1]");
             $url = preg_replace_callback(
                 '/\{(\w+)\.(\w+)\}/',
                 function($match) use ($fields) {
@@ -130,7 +136,7 @@ abstract class Resource
                         return $fields->links->$name;
                 },
                 $val);
-            print_r("Made url: $url\n");
+            //print_r("Made url: $url\n");
             //if(isset($fields->links->$key)) {
                 // we have a url for a specific item, so check if it was side loaded
                 // otherwise stub it out
@@ -162,8 +168,8 @@ abstract class Resource
                 }*/
         }
 
-        print_r('printing self\n');
-        print_r($this);
+        //print_r('printing self\n');
+        //print_r($this);
 
         //if($request->api_keys)
         //    die(0);
@@ -264,7 +270,7 @@ abstract class Resource
             $payload[$key] = $val;
         }
 
-        print_r($payload);
+        //print_r($payload);
         //if($payload) die(10);
 
         // update
@@ -291,12 +297,13 @@ abstract class Resource
 
     public function delete()
     {
-        self::getClient()->delete($this->uri);
+        self::getClient()->delete($this->href);
 
         return $this;
     }
 
-    public function unstore() {
+    public function unstore()
+    {
         return $this->delete();
     }
 }

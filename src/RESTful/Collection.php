@@ -32,8 +32,8 @@ class Collection extends Itemization
     {
         $class = $this->resource;
         $client = $class::getClient();
-        print_r($this->uri);
-        print_r($payload);
+        //print_r($this->uri);
+        //print_r($payload);
 
         $response = $client->post($this->uri, $payload);
 
@@ -48,5 +48,10 @@ class Collection extends Itemization
     public function paginate()
     {
         return new Pagination($this->resource, $this->uri);
+    }
+
+    public function first()
+    {
+        return $this->query()->first();
     }
 }
