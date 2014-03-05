@@ -5,7 +5,8 @@ namespace RESTful;
 abstract class Resource
 {
     protected $_collection_uris,
-              $_member_uris;
+              $_member_uris,
+              $_unmatched_uris;
 
     public static function getClient()
     {
@@ -28,12 +29,12 @@ abstract class Resource
         return $class::$_uri_spec;
     }
 
-    public function __construct($fields = null)
+    public function __construct($fields = null, $links = null)
     {
         if ($fields == null) {
             $fields = array();
         }
-        $this->_objectify($fields);
+        $this->_objectify($fields, $links);
     }
 
     public function __get($name)
@@ -45,16 +46,45 @@ abstract class Resource
 
             return $this->$name;
         } // member uri
-        else if (array_key_exists($name, $this->_member_uris)) {
+        elseif (array_key_exists($name, $this->_member_uris)) {
             $result = $this->_member_uris[$name];
             $response = self::getClient()->get($result['uri']);
             $class = $result['class'];
             $this->$name = new $class($response->body);
 
             return $this->$name;
+        } elseif (array_key_exists($name, $this->_unmatched_uris)) {
+            $result = $this->_unmatched_uris[$name];
+            $response = self::getClient()->get($result['uri']);
+            $resource_href = null;
+            foreach($response->body as $key => $val) {
+                if(is_array($val) && isset($val[0]->href)) {
+                    $resource_href = $val[0]->href;
+                    break;
+                }
+            }
+            $result = self::getRegistry()->match($resource_href);
+            if($result != null) {
+                //print_r($resource_href);
+                $class = $result['class'];
+                $this->$name = new $class($response->body);
+                return $this->$name;
+            }
+
+
+            //print_r($response);
+            //print_r($response->body->keys);
+
+            //die(99);
+//$class = $result['class'];
+            //$this->$name = new $class($response->body);
+
+            //return $this->$name;
+
         }
 
         // unknown
+        print_r($this);
         $trace = debug_backtrace();
         trigger_error(
             sprintf('Undefined property via __get(): %s in %s on line %s', $name, $trace[0]['file'], $trace[0]['line']),
@@ -66,7 +96,9 @@ abstract class Resource
 
     public function __isset($name)
     {
-        if (array_key_exists($name, $this->_collection_uris) || array_key_exists($name, $this->_member_uris)) {
+        if (array_key_exists($name, $this->_collection_uris) ||
+            array_key_exists($name, $this->_member_uris) ||
+            array_key_exists($name, $this->_unmatched_uris)) {
             return true;
         }
 
@@ -78,6 +110,7 @@ abstract class Resource
         // initialize uris
         $this->_collection_uris = array();
         $this->_member_uris = array();
+        $this->_unmatched_uris = array();
 
         $resource_name = $this->getURISpec()->name;
 
@@ -87,8 +120,10 @@ abstract class Resource
         /* print_r(isset($resquest->$resource_name)); */
 
         if($links == null) {
-            var_dump($request);
-            print_r($resource_name);
+            //var_dump($request);
+            //print_r($resource_name);
+            //print_r($request);
+            //print_r($links);
             $fields = $request->$resource_name;
             $fields = $fields[0];
             $links = $request->links;
@@ -155,7 +190,11 @@ abstract class Resource
                         );
                     }
                 } else {
-                    print_r("FAILED TO FIND RESOURCE FOR $url");
+                    $this->_unmatched_uris[$name] = array(
+                        'uri' => $url
+                    );
+                    // TODO: remove, if a resource type isn't found then just ignore it
+                    //print_r("FAILED TO FIND RESOURCE FOR $url");
                     //die(1);
                 }
                 /*} else {
@@ -297,7 +336,11 @@ abstract class Resource
 
     public function delete()
     {
-        self::getClient()->delete($this->href);
+        $resp = self::getClient()->delete($this->href);
+
+        if($resp->code == 200) {
+            $this->_objectify($resp->body);
+        }
 
         return $this;
     }
@@ -305,5 +348,12 @@ abstract class Resource
     public function unstore()
     {
         return $this->delete();
+    }
+
+    public function refresh()
+    {
+        $resp = self::getClient()->get($this->href);
+        $this->_objectify($resp->body);
+        return $this;
     }
 }

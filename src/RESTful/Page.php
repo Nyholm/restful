@@ -29,8 +29,8 @@ class Page
         //die(22);
         if(isset($data->$resource_name))
             $this->items = array_map(
-                function ($x) use ($resource) {
-                    return new $resource($x);
+                function ($x) use ($resource, $data) {
+                    return new $resource($x, $data->links);
                 },
                 $data->$resource_name);
         else
