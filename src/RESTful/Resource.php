@@ -84,7 +84,7 @@ abstract class Resource
         }
 
         // unknown
-        print_r($this);
+        //print_r($this);
         $trace = debug_backtrace();
         trigger_error(
             sprintf('Undefined property via __get(): %s in %s on line %s', $name, $trace[0]['file'], $trace[0]['line']),

@@ -28,7 +28,7 @@ class Collection extends Itemization
         }
     }
 
-    public function create($payload)
+    public function create($payload = array())
     {
         $class = $this->resource;
         $client = $class::getClient();
