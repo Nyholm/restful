@@ -119,7 +119,7 @@ abstract class Resource
         /* print_r($request->$resource_name); */
         /* print_r(isset($resquest->$resource_name)); */
 
-        if($links == null) {
+        if(isset($request->$resource_name) && $links == null) {
             //var_dump($request);
             //print_r($resource_name);
             //print_r($request);
@@ -149,30 +149,33 @@ abstract class Resource
         /* print_r("FIELDS\n"); */
         /* print_r($fields); */
 
-        foreach ($fields as $key => $val) {
-            //if($key == 'links') continue;
-            $this->$key = $val;
+        if($fields) {
+            foreach ($fields as $key => $val) {
+                //if($key == 'links') continue;
+                $this->$key = $val;
+            }
         }
-        foreach($links as $key => $val) {
-            // the links might include links for other resources as well
-            $parts = explode('.', $key);
-            if($parts[0] != $resource_name) continue;
-            //if(strpos($key, $resource_name) !== 0) continue;
-            $name = $parts[1];
+        if($links) {
+            foreach($links as $key => $val) {
+                // the links might include links for other resources as well
+                $parts = explode('.', $key);
+                if($parts[0] != $resource_name) continue;
+                //if(strpos($key, $resource_name) !== 0) continue;
+                $name = $parts[1];
 
-            //print_r("Working on link $parts[1]");
-            $url = preg_replace_callback(
-                '/\{(\w+)\.(\w+)\}/',
-                function($match) use ($fields) {
-                    $name = $match[2];
-                    if(isset($fields->$name))
-                        return $fields->$name;
-                    elseif(isset($fields->links->$name))
-                        return $fields->links->$name;
-                },
-                $val);
-            //print_r("Made url: $url\n");
-            //if(isset($fields->links->$key)) {
+                //print_r("Working on link $parts[1]");
+                $url = preg_replace_callback(
+                    '/\{(\w+)\.(\w+)\}/',
+                    function($match) use ($fields) {
+                        $name = $match[2];
+                        if(isset($fields->$name))
+                            return $fields->$name;
+                        elseif(isset($fields->links->$name))
+                            return $fields->links->$name;
+                    },
+                    $val);
+                //print_r("Made url: $url\n");
+                //if(isset($fields->links->$key)) {
                 // we have a url for a specific item, so check if it was side loaded
                 // otherwise stub it out
                 $result = self::getRegistry()->match($url);
@@ -205,8 +208,8 @@ abstract class Resource
                     if(
                 }
                 }*/
+            }
         }
-
         //print_r('printing self\n');
         //print_r($this);
 
