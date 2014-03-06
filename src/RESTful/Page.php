@@ -22,11 +22,7 @@ class Page
             $client = $resource::getClient();
             $data = $client->get($uri)->body;
         }
-        //print_r($data);
-        //print_r($resource);
         $resource_name = $resource::getURISpec()->name;
-        //print_r($resource_name);
-        //die(22);
         if(isset($data->$resource_name))
             $this->items = array_map(
                 function ($x) use ($resource, $data) {

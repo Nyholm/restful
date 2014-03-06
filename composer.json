@@ -1,10 +1,10 @@
 {
-    "name": "bninja/restful",
+    "name": "matthewfl/restful",
     "description": "Library for writing RESTful PHP clients.",
-    "homepage": "http://github.com/bninja/restful",
+    "homepage": "http://github.com/matthewfl/restful",
     "license": "MIT",
     "keywords": ["http", "api", "client", "rest"],
-    "version": "0.1.8",
+    "version": "0.1.9",
     "authors": [
     ],
     "require": {
@@ -14,5 +14,17 @@
         "psr-0": {
             "RESTful": "src/"
         }
-    }
+    },
+    "authors": [
+        {
+            "name": "andrew",
+            "homepage": "https://github.com/bninja/",
+            "role": "Developer"
+        },
+        {
+            "name": "matthew",
+            "homepage": "https://github.com/matthewfl/",
+            "role": "Developer"
+        }
+    ]
 }

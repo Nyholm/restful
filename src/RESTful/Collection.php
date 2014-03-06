@@ -32,8 +32,6 @@ class Collection extends Itemization
     {
         $class = $this->resource;
         $client = $class::getClient();
-        //print_r($this->uri);
-        //print_r($payload);
 
         $response = $client->post($this->uri, $payload);
 

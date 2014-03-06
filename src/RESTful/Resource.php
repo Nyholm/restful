@@ -65,26 +65,14 @@ abstract class Resource
             }
             $result = self::getRegistry()->match($resource_href);
             if($result != null) {
-                //print_r($resource_href);
                 $class = $result['class'];
                 $this->$name = new $class($response->body);
                 return $this->$name;
             }
 
-
-            //print_r($response);
-            //print_r($response->body->keys);
-
-            //die(99);
-//$class = $result['class'];
-            //$this->$name = new $class($response->body);
-
-            //return $this->$name;
-
         }
 
         // unknown
-        //print_r($this);
         $trace = debug_backtrace();
         trigger_error(
             sprintf('Undefined property via __get(): %s in %s on line %s', $name, $trace[0]['file'], $trace[0]['line']),
@@ -114,17 +102,7 @@ abstract class Resource
 
         $resource_name = $this->getURISpec()->name;
 
-        /* print_r($request); */
-        /* print_r($resource_name); */
-        /* print_r($request->$resource_name); */
-        /* print_r(isset($resquest->$resource_name)); */
-        print_r($request);
-
         if(isset($request->$resource_name) && $links == null) {
-            //var_dump($request);
-            //print_r($resource_name);
-            //print_r($request);
-            //print_r($links);
             $fields = $request->$resource_name;
             $fields = $fields[0];
             $links = $request->links;
@@ -132,27 +110,8 @@ abstract class Resource
             $fields = $request;
         }
 
-        /* print_r($fields); */
-        /* $a = 'api_keys'; */
-        /* print_r($fields->$a); */
-        /* var_dump($this->getURISpec()); */
-
-        //$obj = $fields[self::$_uri_spec->name];
-        //print_r($obj);
-
-        //print_r('printing fields\n');
-
-        //print_r($fields);
-        //var_dump($fields);
-
-
-
-        /* print_r("FIELDS\n"); */
-        /* print_r($fields); */
-
         if($fields) {
             foreach ($fields as $key => $val) {
-                //if($key == 'links') continue;
                 $this->$key = $val;
             }
         }
@@ -161,10 +120,8 @@ abstract class Resource
                 // the links might include links for other resources as well
                 $parts = explode('.', $key);
                 if($parts[0] != $resource_name) continue;
-                //if(strpos($key, $resource_name) !== 0) continue;
                 $name = $parts[1];
 
-                //print_r("Working on link $parts[1]");
                 $url = preg_replace_callback(
                     '/\{(\w+)\.(\w+)\}/',
                     function($match) use ($fields) {
@@ -175,8 +132,6 @@ abstract class Resource
                             return $fields->links->$name;
                     },
                     $val);
-                //print_r("Made url: $url\n");
-                //if(isset($fields->links->$key)) {
                 // we have a url for a specific item, so check if it was side loaded
                 // otherwise stub it out
                 $result = self::getRegistry()->match($url);
@@ -197,78 +152,9 @@ abstract class Resource
                     $this->_unmatched_uris[$name] = array(
                         'uri' => $url
                     );
-                    // TODO: remove, if a resource type isn't found then just ignore it
-                    //print_r("FAILED TO FIND RESOURCE FOR $url");
-                    //die(1);
                 }
-                /*} else {
-                // this item is paged
-                $result = self::getRegistry()->match($url);
-                if($result != null) {
-                    $class = $result['class'];
-                    if(
-                }
-                }*/
             }
         }
-        //print_r('printing self\n');
-        //print_r($this);
-
-        //if($request->api_keys)
-        //    die(0);
-
-        /*foreach ($fields as $key => $val) {
-            // nested uri
-            if ((strlen($key) - 3) == strrpos($key, 'uri', 0) && $key != 'uri') {
-                $result = self::getRegistry()->match($val);
-                if ($result != null) {
-                    $name = substr($key, 0, -4);
-                    $class = $result['class'];
-                    if ($result['collection']) {
-                        $this->_collection_uris[$name] = array(
-                            'class' => $class,
-                            'uri'   => $val,
-                        );
-                    } else {
-                        $this->_member_uris[$name] = array(
-                            'class' => $class,
-                            'uri'   => $val,
-                        );
-                    }
-
-                    continue;
-                }
-            } elseif (is_object($val) && property_exists($val, 'uri')) {
-                // nested
-                $result = self::getRegistry()->match($val->uri);
-                if ($result != null) {
-                    $class = $result['class'];
-                    if ($result['collection']) {
-                        $this->$key = new Collection($class, $val['uri'], $val);
-                    } else {
-                        $this->$key = new $class($val);
-                    }
-
-                    continue;
-                }
-            } elseif (is_array($val) && array_key_exists('uri', $val)) {
-                $result = self::getRegistry()->match($val['uri']);
-                if ($result != null) {
-                    $class = $result['class'];
-                    if ($result['collection']) {
-                        $this->$key = new Collection($class, $val['uri'], $val);
-                    } else {
-                        $this->$key = new $class($val);
-                    }
-
-                    continue;
-                }
-            }
-
-            // default
-            $this->$key = $val;
-            }*/
-
     }
 
     public static function query()
@@ -307,14 +193,8 @@ abstract class Resource
         $payload = array();
         foreach ($this as $key => $val) {
             if($key[0] == '_') continue;
-            /* if ($key[0] == '_' || is_object($val)) { */
-            /*     continue; */
-            /* } */
             $payload[$key] = $val;
         }
-
-        //print_r($payload);
-        //if($payload) die(10);
 
         // update
         if (array_key_exists('href', $payload)) {
@@ -329,10 +209,6 @@ abstract class Resource
             $response = self::getClient()->post($class::$_uri_spec->collection_uri, $payload);
         }
 
-        // re-objectify
-        /* foreach ($this as $key => $val) { */
-        /*     unset($this->$key); */
-        /* } */
         $this->_objectify($response->body);
 
         return $this;
