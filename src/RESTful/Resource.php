@@ -118,6 +118,7 @@ abstract class Resource
         /* print_r($resource_name); */
         /* print_r($request->$resource_name); */
         /* print_r(isset($resquest->$resource_name)); */
+        print_r($request);
 
         if(isset($request->$resource_name) && $links == null) {
             //var_dump($request);
