@@ -21,6 +21,8 @@ class Settings
     public static $version = '0.1.0';
 
     public static $api_key = null;
+
+    public static $accept = '*/*';
 }
 
 class Resource extends \RESTful\Resource
@@ -191,23 +193,27 @@ class PageTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
     {
+        $meta = new \stdClass();
+        $meta->first = 'some/first/uri';
+        $meta->previous = 'some/previous/uri';
+        $meta->next = null;
+        $meta->last = 'some/last/uri';
+        $meta->limit= 25;
+        $meta->offset = 0;
+        $meta->total = 101;
+
         $data = new \stdClass();
-        $data->first_uri = 'some/first/uri';
-        $data->previous_uri = 'some/previous/uri';
-        $data->next_uri = null;
-        $data->last_uri = 'some/last/uri';
-        $data->limit= 25;
-        $data->offset = 0;
-        $data->total = 101;
-        $data->items = array();
+        $data->meta = $meta;
+        $data->B = array();
+
 
         $page = new Page(
-            'Resource',
+            'RESTful\Test\B',
             '/some/uri',
             $data
             );
 
-        $this->assertEquals($page->resource, 'Resource');
+        $this->assertEquals($page->resource, 'RESTful\Test\B');
         $this->assertEquals($page->total, 101);
         $this->assertEquals($page->items, array());
         $this->assertTrue($page->hasPrevious());
@@ -225,17 +231,17 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testObjectify()
     {
-        $a = new A(array(
-            'uri' => '/as/123',
-            'field1' => 123,
-            'b' => array(
-                'uri' => '/bs/321',
-                'field2' => 321
-            ))
-        );
+
+        $content = new \stdClass;
+        $content->href = '/as/123';
+        $content->field1 = 123;
+        $req = new \stdClass;
+        $req->as = array($content);
+        $req->links = null;
+
+        $a = new A($req);
+
         $this->assertEquals(get_class($a), 'RESTful\Test\A');
         $this->assertEquals($a->field1, 123);
-        $this->assertEquals(get_class($a->b), 'RESTful\Test\B');
-        $this->assertEquals($a->b->field2, 321);
     }
 }
