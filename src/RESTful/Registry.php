@@ -13,15 +13,18 @@ class Registry
 
     public function match($uri)
     {
-        foreach ($this->_resources as $resource) {
-            $spec = $resource::getURISpec();
-            $result = $spec->match($uri);
-            if ($result == null) {
-                continue;
-            }
-            $result['class'] = $resource;
 
-            return $result;
+        foreach ($this->_resources as $resource) {
+            $specs = $resource::getURISpecs();
+            foreach ($specs as $spec) {
+                $result = $spec->match($uri);
+                if ($result == null) {
+                    continue;
+                }
+                $result['class'] = $resource;
+
+                return $result;
+            }
         }
 
         return null;
