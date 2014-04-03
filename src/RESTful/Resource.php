@@ -5,8 +5,8 @@ namespace RESTful;
 abstract class Resource
 {
     protected $_collection_uris,
-        $_member_uris,
-        $_unmatched_uris;
+              $_member_uris,
+              $_unmatched_uris;
 
     public static function getClient()
     {
