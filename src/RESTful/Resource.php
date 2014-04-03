@@ -194,7 +194,6 @@ abstract class Resource
             }
         }
         $response = self::getClient()->get($uri);
-        echo $response;
         return new $class($response->body);
     }
 
