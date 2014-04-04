@@ -5,8 +5,8 @@ namespace RESTful;
 abstract class Resource
 {
     protected $_collection_uris,
-              $_member_uris,
-              $_unmatched_uris;
+        $_member_uris,
+        $_unmatched_uris;
 
     public static function getClient()
     {
@@ -22,14 +22,11 @@ abstract class Resource
         return $class::$_registry;
     }
 
-    public static function getURISpecs()
+    public static function getURISpec()
     {
         $class = get_called_class();
-        if (is_array($class::$_uri_spec)) {
-            return $class::$_uri_spec;
-        } else {
-            return array($class::$_uri_spec);
-        }
+
+        return $class::$_uri_spec;
     }
 
     public function __construct($fields = null, $links = null)
@@ -103,13 +100,8 @@ abstract class Resource
         $this->_member_uris = array();
         $this->_unmatched_uris = array();
 
-        $resources = $this->getURISpecs();
-        if (sizeof($resources) > 1) {
-            $resource = $resources[1];
-        } else {
-            $resource = $resources[0];
-        }
-        $resource_name = $resource->name;
+        $resource_name = $this->getURISpec()->name;
+
         if(isset($request->$resource_name) && $links == null) {
             $fields = $request->$resource_name;
             $fields = $fields[0];
@@ -163,17 +155,14 @@ abstract class Resource
                 }
             }
         }
-
     }
 
     public static function query()
     {
-        $uri_specs = self::getURISpecs();
-        foreach ($uri_specs as $uri_spec) {
-            if ($uri_spec == null || $uri_spec->collection_uri == null) {
-                $msg = sprintf('Cannot directly query %s resources', get_called_class());
-                throw new \LogicException($msg);
-            }
+        $uri_spec = self::getURISpec();
+        if ($uri_spec == null || $uri_spec->collection_uri == null) {
+            $msg = sprintf('Cannot directly query %s resources', get_called_class());
+            throw new \LogicException($msg);
         }
 
         return new Query(get_called_class(), $uri_spec->collection_uri);
@@ -182,18 +171,19 @@ abstract class Resource
     public static function get($uri)
     {
         $class = get_called_class();
+
         # id
         if (strncmp($uri, '/', 1)) {
-            $uri_specs = self::getURISpecs();
-            foreach ($uri_specs as $uri_spec) {
-                if ($uri_spec == null || $uri_spec->collection_uri == null) {
-                    $msg = sprintf('Cannot get %s resources by id %s', $class, $uri);
-                    throw new \LogicException($msg);
-                }
-                $uri = $uri_spec->collection_uri . '/' . $uri;
+            $uri_spec = self::getURISpec();
+            if ($uri_spec == null || $uri_spec->collection_uri == null) {
+                $msg = sprintf('Cannot get %s resources by id %s', $class, $uri);
+                throw new \LogicException($msg);
             }
+            $uri = $uri_spec->collection_uri . '/' . $uri;
         }
+
         $response = self::getClient()->get($uri);
+
         return new $class($response->body);
     }
 
