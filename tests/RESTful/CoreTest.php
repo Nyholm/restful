@@ -29,7 +29,7 @@ class Resource extends \RESTful\Resource
 {
     public static $fields, $f;
 
-    protected static $_client, $_registry, $_uri_spec;
+    protected static $_client, $_registry, $_uri_spec, $_override__uri_spec;
 
     public static function init()
     {
