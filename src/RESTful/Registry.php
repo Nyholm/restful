@@ -27,4 +27,3 @@ class Registry
         return null;
     }
 }
-
