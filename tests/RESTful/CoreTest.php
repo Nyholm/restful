@@ -29,7 +29,7 @@ class Resource extends \RESTful\Resource
 {
     public static $fields, $f;
 
-    protected static $_client, $_registry, $_uri_spec, $_override__uri_spec;
+    protected static $_client, $_registry, $_uri_spec;
 
     public static function init()
     {
@@ -240,8 +240,9 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $req->links = null;
 
         $a = new A($req);
-
+//        var_dump($a);
         $this->assertEquals(get_class($a), 'RESTful\Test\A');
+
         $this->assertEquals($a->field1, 123);
     }
 }

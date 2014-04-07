@@ -107,11 +107,14 @@ abstract class Resource
         $this->_member_uris = array();
         $this->_unmatched_uris = array();
 
-        if ($this->getOverrideURISpec()->name == null) {
-            $resource_name = $this->getURISpec()->name;
-        } else {
+        $class = get_called_class();
+
+        if (property_exists($class, '_override__uri_spec')) {
             $resource_name = $this->getOverrideURISpec()->name;
+        } else {
+            $resource_name = $this->getURISpec()->name;
         }
+         var_dump($resource_name);
 
         if(isset($request->$resource_name) && $links == null) {
             $fields = $request->$resource_name;
