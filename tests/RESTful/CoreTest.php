@@ -240,7 +240,6 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $req->links = null;
 
         $a = new A($req);
-//        var_dump($a);
         $this->assertEquals(get_class($a), 'RESTful\Test\A');
 
         $this->assertEquals($a->field1, 123);
