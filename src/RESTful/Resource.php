@@ -114,7 +114,7 @@ abstract class Resource
         } else {
             $resource_name = $this->getURISpec()->name;
         }
-         var_dump($resource_name);
+       
 
         if(isset($request->$resource_name) && $links == null) {
             $fields = $request->$resource_name;
