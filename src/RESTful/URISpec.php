@@ -8,9 +8,15 @@ class URISpec
         $name,
         $idNames;
 
-    public function __construct($name, $idNames, $root = null)
+    # $override supercedes $name when creating an object, only necessary when
+    # name and class are not equal
+    public function __construct($name, $idNames, $root = null, $override = null)
     {
         $this->name = $name;
+        if ($override != null) {
+            $this->override = $override;
+        }
+
         if (!is_array($idNames)) {
             $idNames = array($idNames);
         }

@@ -5,8 +5,8 @@ namespace RESTful;
 abstract class Resource
 {
     protected $_collection_uris,
-              $_member_uris,
-              $_unmatched_uris;
+        $_member_uris,
+        $_unmatched_uris;
 
     public static function getClient()
     {
@@ -100,7 +100,13 @@ abstract class Resource
         $this->_member_uris = array();
         $this->_unmatched_uris = array();
 
-        $resource_name = $this->getURISpec()->name;
+        $class = get_called_class();
+
+        if ($this->getURISpec()->override != null) {
+            $resource_name = $this->getURISpec()->override;
+        } else {
+            $resource_name = $this->getURISpec()->name;
+        }
 
         if(isset($request->$resource_name) && $links == null) {
             $fields = $request->$resource_name;
