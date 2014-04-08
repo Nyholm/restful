@@ -29,13 +29,6 @@ abstract class Resource
         return $class::$_uri_spec;
     }
 
-    public static function getOverrideURISpec()
-    {
-        $class = get_called_class();
-
-        return $class::$_override__uri_spec;
-    }
-
     public function __construct($fields = null, $links = null)
     {
         if ($fields == null) {
@@ -109,12 +102,11 @@ abstract class Resource
 
         $class = get_called_class();
 
-        if (property_exists($class, '_override__uri_spec')) {
-            $resource_name = $this->getOverrideURISpec()->name;
+        if ($this->getURISpec()->override != null) {
+            $resource_name = $this->getURISpec()->override;
         } else {
             $resource_name = $this->getURISpec()->name;
         }
-       
 
         if(isset($request->$resource_name) && $links == null) {
             $fields = $request->$resource_name;
