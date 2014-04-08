@@ -5,8 +5,9 @@ namespace RESTful;
 class URISpec
 {
     public $collection_uri = null,
-        $name,
-        $idNames;
+           $name,
+           $idNames,
+           $ovverride = null;
 
     # $override supercedes $name when creating an object, only necessary when
     # name and class are not equal
