@@ -4,7 +4,7 @@
     "homepage": "http://github.com/matthewfl/restful",
     "license": "MIT",
     "keywords": ["http", "api", "client", "rest"],
-    "version": "1.0.2",
+    "version": "1.0.3",
     "authors": [
     ],
     "require": {

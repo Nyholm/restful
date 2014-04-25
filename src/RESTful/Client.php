@@ -16,6 +16,7 @@ class Client
 
     public function get($uri)
     {
+        $uri = str_replace(' ', '%20', $uri);
         $settings_class = $this->settings_class;
         $url = $settings_class::$url_root . $uri;
         $request_class = $this->request_class;
