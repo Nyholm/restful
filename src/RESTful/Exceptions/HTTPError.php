@@ -26,7 +26,7 @@ class HTTPError extends Base
                 'status'  => "Bad Request",
                 'category_code' => "Bad Request",
                 'description' => "Bad Request",
-                'status_code' => 404,
+                'status_code' => 400,
             );
         } else {
             $fields = $fields->errors[0];
