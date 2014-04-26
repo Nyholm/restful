@@ -17,7 +17,7 @@ class Client
     public function get($uri)
     {
         if (preg_match('/\s/',$uri)) {
-            throw new \RESTful\Exceptions\HTTPError(400);
+            throw new \RESTful\Exceptions\HTTPError(404);
         } else {
             $settings_class = $this->settings_class;
             $url = $settings_class::$url_root . $uri;
