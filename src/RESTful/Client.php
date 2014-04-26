@@ -16,13 +16,15 @@ class Client
 
     public function get($uri)
     {
-        $uri = str_replace(' ', '%20', $uri);
-        $settings_class = $this->settings_class;
-        $url = $settings_class::$url_root . $uri;
-        $request_class = $this->request_class;
-        $request = $request_class::get($url);
-
-        return $this->_op($request);
+        if (preg_match('/\s/',$uri)) {
+            throw new \RESTful\Exceptions\HTTPError(400);
+        } else {
+            $settings_class = $this->settings_class;
+            $url = $settings_class::$url_root . $uri;
+            $request_class = $this->request_class;
+            $request = $request_class::get($url);
+            return $this->_op($request);
+        }
     }
 
     public function post($uri, $payload)
