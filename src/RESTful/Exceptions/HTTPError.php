@@ -21,16 +21,7 @@ class HTTPError extends Base
 
     protected function _objectify($fields)
     {
-        if (empty($fields->errors[0])) {
-            $fields = array(
-                'status'  => "Bad Request",
-                'category_code' => "Bad Request",
-                'description' => "Bad Request",
-                'status_code' => 404,
-            );
-        } else {
-            $fields = $fields->errors[0];
-        };
+        $fields = $fields->errors[0];
         foreach ($fields as $key => $val) {
             $this->$key = $val;
         }
