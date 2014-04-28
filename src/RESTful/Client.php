@@ -16,15 +16,8 @@ class Client
 
     public function get($uri)
     {
-        $uri_characters_array = str_split($uri);
-        $uri_string = '';
-        foreach ($uri_characters_array as &$character) {
-            if ($character != '/') {
-                $character = rawurlencode($character);
-            }
-            $uri_string = $uri_string.$character;
-        }
-        $uri = $uri_string;
+        $encoded_uri = implode('/', array_map('rawurlencode', explode('/', $uri)));
+        $uri = $encoded_uri;
         $settings_class = $this->settings_class;
         $url = $settings_class::$url_root . $uri;
         $request_class = $this->request_class;
