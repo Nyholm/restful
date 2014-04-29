@@ -16,12 +16,14 @@ class Client
 
     public function get($uri)
     {
+        $encoded_uri = implode('/', array_map('rawurlencode', explode('/', $uri)));
+        $uri = $encoded_uri;
         $settings_class = $this->settings_class;
         $url = $settings_class::$url_root . $uri;
         $request_class = $this->request_class;
         $request = $request_class::get($url);
-
         return $this->_op($request);
+
     }
 
     public function post($uri, $payload)
